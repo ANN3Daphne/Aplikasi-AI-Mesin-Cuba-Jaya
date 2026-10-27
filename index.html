@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detektif Pendaraban</title>
+<style>
+:root{--navy:#101b35;--navy2:#1c2e52;--gold:#f4c95d;--cream:#fff8e8;--ink:#17233f;--mint:#b9f3d1;--red:#f6a5a5;--blue:#91c8ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--cream);background:radial-gradient(circle at 12% 10%,#344d78 0,transparent 28%),radial-gradient(circle at 88% 25%,#273b60 0,transparent 30%),linear-gradient(135deg,#0b1225,#172747 55%,#0b1225);background-attachment:fixed}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1200px;margin:auto;padding:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{font-size:40px;filter:drop-shadow(0 0 8px #f4c95d)}
+.title-container{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+h1{font-size:clamp(1.55rem,3vw,2.3rem);margin:0;color:var(--gold)}
+.author-tag{font-size:.85rem;color:var(--mint);font-weight:700;background:rgba(185,243,209,0.12);padding:3px 8px;border-radius:6px;border:1px solid rgba(185,243,209,0.3)}
+.subtitle{color:#cfdaef;font-size:.92rem;margin-top:2px;}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.language-control{display:flex;align-items:center;gap:7px;color:#e5edfb;font-size:.85rem;font-weight:800}.language-control select{width:auto;min-width:155px}
+.btn{border:1px solid #62769c;background:#24385c;color:white;border-radius:12px;padding:10px 13px;font-weight:700;transition:transform .12s,background .12s}
+.btn:hover{transform:translateY(-1px);background:#304a75}
+.btn.gold{background:var(--gold);color:#1b2540;border-color:#ffdf80}
+.btn.soft{background:#152642}
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px}
+.panel{border:1px solid #4c6288;border-radius:20px;background:rgba(17,31,57,.91);box-shadow:0 15px 35px #0003;padding:18px}
+.panel h2{margin:0 0 12px;font-size:1.2rem}
+.safe-panel{position:relative;overflow:hidden}
+.safe-panel:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 24px,#ffffff05 24px 26px);pointer-events:none}
+.safe-panel>*{position:relative}
+.case-label{font-size:.75rem;letter-spacing:3px;font-weight:900;color:var(--gold)}
+.safe{width:min(100%,470px);margin:12px auto 16px;border:8px solid #73829d;border-radius:24px;padding:16px;background:linear-gradient(145deg,#394b69,#172744 70%);box-shadow:inset 0 0 0 3px #101a2d,0 15px 30px #0005}
+.safe-top{display:flex;justify-content:space-between;align-items:center;color:#d7e1f5;font-size:.8rem;font-weight:800;letter-spacing:1px}
+.safe-light{width:9px;height:9px;border-radius:50%;background:#6bf0a4;box-shadow:0 0 12px #6bf0a4}
+.question{margin:18px 0 12px;text-align:center;background:#0b1427;border:2px solid #647a9f;border-radius:14px;padding:18px 10px;color:#fff3c5;font-size:clamp(1.8rem,5vw,3rem);font-weight:900;letter-spacing:1px;min-height:88px;display:grid;place-items:center}
+.answer-row{display:flex;gap:8px;max-width:300px;margin:auto}
+#answerInput{width:100%;min-width:0;text-align:center;font-size:1.3rem;font-weight:800;border:2px solid #9eafcd;border-radius:12px;background:#fff;color:#16213b;padding:10px}
+.feedback{min-height:45px;text-align:center;padding:10px 4px 0;font-weight:700;color:#d9e5fa}
+.feedback.good{color:var(--mint)}.feedback.bad{color:#ffb6b6}
+.keypad{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:400px;margin:10px auto 0}
+.key{padding:11px 4px;border-radius:10px;border:1px solid #62779d;background:#263b61;color:white;font-size:1.08rem;font-weight:800}
+.key:hover{background:#395783}.key.action{background:#40506c;color:#fff}.key.check{grid-column:span 2;background:var(--gold);color:#1a2540;border-color:#ffe49a}
+.clue{margin-top:14px;padding:12px;border-left:4px solid var(--gold);background:#ffffff0b;border-radius:0 10px 10px 0;color:#d7e1f5;font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{padding:10px;border-radius:12px;background:#ffffff0a;text-align:center}
+.stat strong{display:block;font-size:1.3rem;color:var(--gold)}
+.stat span{font-size:.75rem;color:#c6d3e9}
+.right-stack{display:grid;gap:16px;align-content:start}
+.notebook-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.progress{height:8px;border-radius:99px;background:#344565;overflow:hidden;margin:10px 0}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#f4c95d,#a9f0c6);transition:width .3s}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+select{width:100%;padding:9px;border-radius:10px;background:#101d35;color:#fff;border:1px solid #60749a}
+.action-btns{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.action-btns .btn{font-size: 0.85rem; padding: 7px 10px;}
+.notebook-list{display:grid;gap:7px;max-height:280px;overflow:auto;padding-right:3px}
+.equation-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 11px;border-radius:10px;background:#ffffff0a;border:1px solid #344968}
+.equation-item small{color:#aebed9;display:block;font-size:.75rem}
+.empty{color:#b9c7df;text-align:center;padding:22px 8px}
+.badge-section{margin-top:16px}
+.badge-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:12px}
+.badge-item{min-height:145px;padding:13px 9px;border:1px solid #526586;border-radius:14px;text-align:center;background:#1b2c4c}
+.badge-item.unlocked{border-color:#f0c65b;background:linear-gradient(145deg,#253d62,#16243f);box-shadow:inset 0 0 0 1px #f0c65b25}
+.badge-item.locked{opacity:.58;filter:grayscale(1)}
+.badge-symbol{font-size:35px;margin-bottom:6px}
+.badge-name{font-weight:850;font-size:.88rem}
+.badge-description{margin-top:6px;font-size:.75rem;color:#d3dcef}
+.footer-note{color:#b7c6df;font-size:.8rem;margin:14px 2px 0}
+.achievement-modal[hidden]{display:none!important}
+.achievement-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:#050c1ecc;backdrop-filter:blur(5px)}
+.achievement-card{position:relative;width:min(100%,440px);padding:30px 24px;border:3px solid #e7b94b;border-radius:22px;background:linear-gradient(145deg,#fffdf4,#e7edfa);color:#17233f;text-align:center;box-shadow:0 0 35px #ffcf4f66;animation:casePop .35s ease-out}
+@keyframes casePop{from{opacity:0;transform:scale(.75)}to{opacity:1;transform:scale(1)}}
+.achievement-close{position:absolute;top:7px;right:12px;border:0;background:transparent;font-size:28px;cursor:pointer;color:#17233f}
+.achievement-icon{font-size:54px;margin-bottom:8px}
+.achievement-label{font-size:12px;font-weight:900;letter-spacing:3px;color:#986a13}
+.achievement-card h2{margin:8px 0;font-size:27px}
+.achievement-hint{font-size:14px;color:#586783}
+.achievement-button{margin-top:12px;padding:12px 25px;border:0;border-radius:12px;background:#173766;color:white;font-weight:bold;cursor:pointer}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.right-stack{grid-template-columns:1fr}}
+@media(max-width:480px){.app{padding:10px}.panel{padding:13px}.toolbar .btn{padding:8px 10px}.stats{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🕵️</div>
+    <div>
+      <div class="title-container">
+        <h1>Multiplication Detective</h1>
+        <span class="author-tag" id="authorTag">Dibina oleh DAPHNE TANG LI YUN</span>
+      </div>
+      <div class="subtitle">Crack the safe. Collect the clues. Become a maths detective!</div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <label class="language-control" for="languageSelect" id="languageLabel">Bahasa / Language <select id="languageSelect" aria-label="Pilih bahasa"><option value="bm" selected>BM · Bahasa Melayu</option><option value="en">ENG · British English</option></select></label>
+    <button class="btn soft" id="musicButton" type="button">♫ Music: Off</button>
+    <button class="btn soft" id="newCaseButton" type="button">New Case ↻</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="panel safe-panel">
+    <div class="case-label">CONFIDENTIAL CASE FILE</div>
+    <h2>Crack the multiplication safe</h2>
+    <div class="safe">
+      <div class="safe-top"><span>SAFE No. 010</span><span class="safe-light" id="safeLight"></span><span>ACCESS CONTROL</span></div>
+      <div class="question" id="questionText" aria-live="polite">□ × 1 = 1</div>
+      <div class="answer-row">
+        <input id="answerInput" type="text" inputmode="none" autocomplete="off" aria-label="Your answer" placeholder="?">
+        <button class="btn gold" id="checkButton" type="button">Check</button>
+      </div>
+      <div id="feedback" class="feedback" aria-live="polite">Detective, enter your guess using the keypad.</div>
+      <div class="keypad" id="keypad">
+        <button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button><button class="key" data-key="4">4</button><button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button><button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button><button class="key" data-key="0">0</button>
+        <button class="key action" data-key="clear">Clear</button><button class="key action" data-key="back">⌫</button><button class="key check" id="keyCheck" type="button">Unlock safe</button>
+      </div>
+    </div>
+    <div class="clue" id="clueText">🗝️ Clue: Try a number and use the Check button to test your guess.</div>
+    <div class="stats">
+      <div class="stat"><strong id="solvedCount">0</strong><span>Equations collected</span></div>
+      <div class="stat"><strong id="roundCount">0</strong><span>Cases solved</span></div>
+      <div class="stat"><strong id="badgeCount">0</strong><span>Badges unlocked</span></div>
+    </div>
+  </section>
+
+  <div class="right-stack">
+    <section class="panel">
+      <div class="notebook-head"><h2>📓 Detective Notebook</h2><span id="notebookCount">0 / 300</span></div>
+      <div class="progress"><div class="progress-bar" id="collectionProgress"></div></div>
+      <div class="filters">
+        <select id="typeFilter" aria-label="Filter by question type">
+          <option value="all">All question types</option><option value="first">Missing first factor</option><option value="second">Missing second factor</option><option value="product">Missing product</option>
+        </select>
+        <select id="tableFilter" aria-label="Filter by times table">
+          <option value="all">All times tables</option>
+          <option value="1">1 times table</option><option value="2">2 times table</option><option value="3">3 times table</option><option value="4">4 times table</option><option value="5">5 times table</option><option value="6">6 times table</option><option value="7">7 times table</option><option value="8">8 times table</option><option value="9">9 times table</option><option value="10">10 times table</option>
+        </select>
+        <select id="sortSelect" aria-label="Sort notebook" style="grid-column: span 2;">
+          <option value="newest">Sort: Recently collected</option><option value="type">Sort: Question type</option><option value="product">Sort: Product</option><option value="equation">Sort: Equation A–Z</option><option value="chart">Sort: Times table</option>
+        </select>
+      </div>
+      <div class="action-btns">
+        <button class="btn soft" id="showNotebookButton" type="button">Reset Filters</button>
+        <button class="btn soft" id="dlPdfButton" type="button">📥 PDF</button>
+      </div>
+      <div class="notebook-list" id="notebookList"><div class="empty">No clues collected yet. Crack your first safe!</div></div>
+    </section>
+    <section class="panel">
+      <h2>🗂️ Current Case</h2>
+      <div id="caseMessage">Solve the equation to collect it in your notebook.</div>
+      <div class="clue">💡 <strong>Detective Tip:</strong> For a missing factor, ask yourself: “What number multiplied by the known factor gives this product?”</div>
+    </section>
+  </div>
+</main>
+
+<section class="panel badge-section">
+  <div class="badge-head">
+    <h2>🏅 Detective Badge Case File</h2>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <span id="badgeProgress">Badges unlocked: 0</span>
+        <button class="btn soft" id="dlBadgesButton" type="button" style="font-size:0.85rem; padding: 7px 10px;">📥 Download Badges</button>
+    </div>
+  </div>
+  <p class="subtitle">Collect equations, master times tables and unlock every detective badge.</p>
+  <div class="badge-grid" id="badgeGrid"></div>
+</section>
+<p class="footer-note">Your collection is saved for this browser session only. Refreshing the page starts a new investigation.</p>
+</div>
+
+<div id="achievementModal" class="achievement-modal" role="dialog" aria-modal="true" aria-labelledby="achievementTitle" hidden>
+  <div class="achievement-card">
+    <button class="achievement-close" id="closeAchievement" aria-label="Close" type="button">×</button>
+    <div id="achievementIcon" class="achievement-icon">🔎</div>
+    <p class="achievement-label">CASE UPDATE</p>
+    <h2 id="achievementTitle">Case Closed!</h2>
+    <p id="achievementMessage"></p>
+    <p id="achievementHint" class="achievement-hint"></p>
+    <button id="achievementButton" class="achievement-button" type="button">Awesome!</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const MAX_EQUATIONS = 300;
+  const discoveredKeys = new Set();
+  const notebookEntries = new Map();
+  const unlockedBadges = new Set();
+  const completedTables = new Set();
+  const achievementQueue = [];
+  let question = null;
+  let roundCount = 0;
+  let achievementIsOpen = false;
+  let audioContext = null;
+  let musicTimer = null;
+  let musicOn = false;
+  let musicStep = 0;
+  let autoNextTimer = null;
+  // Keep the clue in canonical English so it can always be re-rendered in either language.
+  let currentClueEnglish = "Try a number and use the Check button to test your guess.";
+  let currentClueMode = "clue";
+
+  const $ = id => document.getElementById(id);
+  // Bahasa Melayu is intentionally the default on every fresh page load.
+  let currentLanguage = "bm";
+  const translations = {
+    "Multiplication Detective":"Detektif Pendaraban",
+    "Developed by DAPHNE TANG LI YUN":"Dibina oleh DAPHNE TANG LI YUN",
+    "Bahasa / Language":"Bahasa / Language",
+    "Crack the safe. Collect the clues. Become a maths detective!":"Buka peti besi. Kumpulkan petunjuk. Jadilah detektif matematik!",
+    "♫ Music: Off":"♫ Muzik: Mati", "♫ Music: On":"♫ Muzik: Hidup", "♫ Audio unavailable":"♫ Audio tidak tersedia",
+    "New Case ↻":"Kes Baharu ↻", "Loading... ↻":"Memuatkan... ↻", "CONFIDENTIAL CASE FILE":"FAIL KES SULIT",
+    "Crack the multiplication safe":"Buka peti besi pendaraban", "SAFE No. 010":"PETI BESI No. 010", "ACCESS CONTROL":"KAWALAN AKSES",
+    "Your answer":"Jawapan anda", "Check":"Semak", "Detective, enter your guess using the keypad.":"Detektif, masukkan tekaan anda menggunakan papan kekunci.",
+    "Clear":"Padam", "Unlock safe":"Buka peti besi", "🗝️ Clue:":"🗝️ Petunjuk:", "🗝️ Clue: Try a number and use the Check button to test your guess.":"🗝️ Petunjuk: Cuba satu nombor dan tekan Semak untuk menguji tekaan anda.",
+    "Equations collected":"Persamaan dikumpulkan", "Cases solved":"Kes diselesaikan", "Badges unlocked":"Lencana dibuka",
+    "📓 Detective Notebook":"📓 Buku Nota Detektif", "All question types":"Semua jenis soalan", "Missing first factor":"Faktor pertama hilang",
+    "Missing second factor":"Faktor kedua hilang", "Missing product":"Hasil darab hilang", "All times tables":"Semua sifir",
+    "1 times table":"Sifir 1", "2 times table":"Sifir 2", "3 times table":"Sifir 3", "4 times table":"Sifir 4", "5 times table":"Sifir 5",
+    "6 times table":"Sifir 6", "7 times table":"Sifir 7", "8 times table":"Sifir 8", "9 times table":"Sifir 9", "10 times table":"Sifir 10",
+    "Sort: Recently collected":"Susun: Terbaharu dikumpulkan", "Sort: Question type":"Susun: Jenis soalan", "Sort: Product":"Susun: Hasil darab",
+    "Sort: Equation A–Z":"Susun: Persamaan A–Z", "Sort: Times table":"Susun: Sifir", "Reset Filters":"Tetapkan Semula Penapis", "📥 PDF":"📥 PDF",
+    "No clues collected yet. Crack your first safe!":"Belum ada petunjuk dikumpulkan. Buka peti besi pertama anda!",
+    "No equations match this view yet. Keep solving cases!":"Tiada persamaan sepadan dengan paparan ini. Terus selesaikan kes!",
+    "🗂️ Current Case":"🗂️ Kes Semasa", "Solve the equation to collect it in your notebook.":"Selesaikan persamaan untuk menyimpannya dalam buku nota.",
+    "💡 Detective tip:":"💡 Tip detektif:", "For a missing factor, ask yourself: “What number multiplied by the known factor gives this product?”":"Jika satu faktor hilang, tanya diri anda: “Nombor apakah yang didarab dengan faktor yang diketahui untuk menghasilkan hasil darab ini?”",
+    "🏅 Detective Badge Case File":"🏅 Fail Lencana Detektif", "📥 Download Badges":"📥 Muat Turun Lencana", "Collect equations, master times tables and unlock every detective badge.":"Kumpulkan persamaan, kuasai sifir dan buka semua lencana detektif.",
+    "Your collection is saved for this browser session only. Refreshing the page starts a new investigation.":"Koleksi anda disimpan untuk sesi pelayar ini sahaja. Memuat semula halaman akan memulakan penyiasatan baharu.",
+    "CASE UPDATE":"KEMAS KINI KES", "Case Closed!":"Kes Selesai!", "Awesome!":"Hebat!", "Close":"Tutup",
+    "Brilliant deduction! You cracked the code!":"Penaakulan yang hebat! Anda berjaya memecahkan kod!",
+    "Excellent work, detective! Another clue secured!":"Syabas, detektif! Satu lagi petunjuk berjaya diperoleh!",
+    "Case solved! Your multiplication skills are sharp!":"Kes selesai! Kemahiran pendaraban anda sangat baik!",
+    "Amazing reasoning! The safe is one step closer to opening!":"Penaakulan yang mengagumkan! Peti besi hampir dibuka!",
+    "Well done! A top detective checks the evidence carefully!":"Bagus! Detektif hebat memeriksa bukti dengan teliti!",
+    "Not quite, detective. Check the known factor and try again!":"Belum tepat, detektif. Semak faktor yang diketahui dan cuba lagi!",
+    "That clue doesn't fit yet. Keep investigating!":"Petunjuk itu belum sepadan. Teruskan penyiasatan!",
+    "Every great detective makes guesses. Try another number!":"Setiap detektif hebat membuat tekaan. Cuba nombor lain!",
+    "Almost there! Think: what number makes this equation true?":"Hampir berjaya! Fikirkan nombor yang menjadikan persamaan ini betul.",
+    "The safe is still locked. Use your multiplication clues!":"Peti besi masih berkunci. Gunakan petunjuk pendaraban anda!",
+    "Try a number, then check whether the equation is true.":"Cuba satu nombor, kemudian semak sama ada persamaan itu betul.",
+    "For a missing factor, think of the times table that contains the product.":"Jika faktor hilang, fikirkan sifir yang mengandungi hasil darab itu.",
+    "Remember: factor × factor = product.":"Ingat: faktor × faktor = hasil darab.",
+    "A careful detective tests a guess against the whole equation.":"Detektif yang teliti menguji tekaan berdasarkan keseluruhan persamaan.",
+    "Look closely at the known number. Which multiplication fact fits?":"Perhatikan nombor yang diketahui. Fakta pendaraban yang manakah sepadan?",
+    "Enter a whole number first, detective.":"Masukkan nombor bulat dahulu, detektif.",
+    "The safe remains locked. Check the multiplication fact and try again.":"Peti besi masih berkunci. Semak fakta pendaraban dan cuba lagi.",
+    "New clue collected! Your equation has been added to the notebook.":"Petunjuk baharu dikumpulkan! Persamaan telah ditambahkan ke dalam buku nota.",
+    "You've already collected this equation. It remains in your notebook!":"Anda telah mengumpulkan persamaan ini. Persamaan ini kekal dalam buku nota anda!",
+    "🔓 Safe unlocked! Generating new case in 1 second...":"🔓 Peti besi dibuka! Kes baharu akan dijana dalam 1 saat...",
+    "collected":"dikumpulkan", "Junior Detective":"Detektif Junior", "Collect your first equation.":"Kumpulkan persamaan pertama anda.",
+    "Sharp-Eyed Sleuth":"Penyiasat Bermata Tajam", "Collect 10 unique equations.":"Kumpulkan 10 persamaan unik.",
+    "Clue Collector":"Pengumpul Petunjuk", "Collect 50 unique equations.":"Kumpulkan 50 persamaan unik.",
+    "Detective Expert":"Pakar Detektif", "Collect 100 unique equations.":"Kumpulkan 100 persamaan unik.",
+    "Master Investigator":"Penyiasat Ulung", "Collect 200 unique equations.":"Kumpulkan 200 persamaan unik.",
+    "Missing Factor Expert":"Pakar Faktor Hilang", "Collect every missing-first-factor entry.":"Kumpulkan semua soalan faktor pertama yang hilang.",
+    "Factor Finder":"Pencari Faktor", "Collect every missing-second-factor entry.":"Kumpulkan semua soalan faktor kedua yang hilang.",
+    "Product Detective":"Detektif Hasil Darab", "Collect every missing-product entry.":"Kumpulkan semua soalan hasil darab yang hilang.",
+    "Legendary Detective":"Detektif Legenda", "Collect all 300 unique equations.":"Kumpulkan kesemua 300 persamaan unik.",
+    "Keep solving equations to unlock!":"Terus selesaikan persamaan untuk membuka lencana!", "Locked":"Dikunci", "Total Unlocked:":"Jumlah dibuka:",
+    "Detective Notebook":"Buku Nota Detektif", "Question Type":"Jenis Soalan", "Factors":"Faktor", "Product":"Hasil Darab",
+    "Badge Unlocked!":"Lencana Dibuka!", "Congratulations! You've earned the":"Tahniah! Anda telah memperoleh lencana", "badge!":"!",
+    "Check your Detective Badge Case File to see your achievement.":"Semak Fail Lencana Detektif untuk melihat pencapaian anda.",
+    "You can go to your notebook to check your collected equations.":"Anda boleh menyemak persamaan yang dikumpulkan dalam buku nota.",
+    "Check your Detective Badge Case File!":"Semak Fail Lencana Detektif anda!",
+    "You've solved every case. Visit your notebook to review your complete collection!":"Anda telah menyelesaikan semua kes. Buka buku nota untuk menyemak koleksi lengkap anda!",
+    "Ultimate Detective!":"Detektif Terunggul!", "Congratulations! You've collected all 300 equations!":"Tahniah! Anda telah mengumpulkan kesemua 300 persamaan!",
+    "Congratulations! You've collected the":"Tahniah! Anda telah mengumpulkan", "times table!":"sifir!", "Times Table Master":"Pakar Sifir",
+    "Complete all 30 entries for the":"Lengkapkan kesemua 30 entri untuk sifir", "times table.":".",
+    "Badges unlocked:":"Lencana dibuka:", "Sort: Recently collected":"Susun: Terbaharu dikumpulkan"
+  };
+  const englishText = new Map();
+  function translateText(text, lang=currentLanguage) {
+    if (lang === "en") return englishText.get(text) || text;
+    const leading = (text.match(/^\\s*/) || [""])[0];
+    const trailing = (text.match(/\\s*$/) || [""])[0];
+    const core = text.trim();
+    if (translations[core]) return leading + translations[core] + trailing;
+    // Translate clue text generated dynamically for each new case.
+    if (core.startsWith("🗝️ Clue:")) {
+      const clue = core.slice("🗝️ Clue:".length).trim();
+      return leading + "🗝️ Petunjuk: " + (translations[clue] || clue) + trailing;
+    }
+    let m;
+    if ((m=text.match(/^(\d+) Times Table Master$/))) return `Pakar Sifir ${m[1]}`;
+    if ((m=text.match(/^Complete all 30 entries for the (\d+) times table\.$/))) return `Lengkapkan kesemua 30 entri untuk sifir ${m[1]}.`;
+    if ((m=text.match(/^Congratulations! You've collected the (\d+) times table!$/))) return `Tahniah! Anda telah mengumpulkan sifir ${m[1]}!`;
+    if ((m=text.match(/^You've earned the (\d+) Times Table Master badge!$/))) return `Anda telah memperoleh lencana Pakar Sifir ${m[1]}!`;
+    if ((m=text.match(/^Congratulations! You've earned the (.+) badge!$/))) return `Tahniah! Anda telah memperoleh lencana ${m[1]}!`;
+    if ((m=text.match(/^Badges unlocked: (\d+)(?: \/ (\d+))?$/))) return `Lencana dibuka: ${m[1]}${m[2] ? ` / ${m[2]}` : ""}`;
+    if ((m=text.match(/^\d+ \/ 300$/))) return text;
+    return text;
+  }
+  function renderClue() {
+    const clueNode = $("clueText");
+    if (!clueNode) return;
+    if (currentClueMode === "unlocked") {
+      clueNode.textContent = currentLanguage === "bm"
+        ? "🔓 Peti besi dibuka! Kes baharu akan dijana dalam 1 saat..."
+        : "🔓 Safe unlocked! Generating new case in 1 second...";
+      return;
+    }
+    const prefix = currentLanguage === "bm" ? "🗝️ Petunjuk: " : "🗝️ Clue: ";
+    const body = currentLanguage === "bm"
+      ? (translations[currentClueEnglish] || currentClueEnglish)
+      : currentClueEnglish;
+    clueNode.textContent = prefix + body;
+  }
+  function setClue(englishMessage, mode="clue") {
+    currentClueEnglish = englishMessage;
+    currentClueMode = mode;
+    renderClue();
+  }
+
+  function applyLanguage(lang) {
+    currentLanguage = lang === "en" ? "en" : "bm";
+    document.documentElement.lang = currentLanguage === "bm" ? "ms" : "en-GB";
+    document.title = currentLanguage === "bm" ? "Detektif Pendaraban" : "Multiplication Detective";
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+      if (!englishText.has(node)) englishText.set(node, node.nodeValue);
+      const original = englishText.get(node);
+      const translated = translateText(original, currentLanguage);
+      if (node.nodeValue !== translated) node.nodeValue = translated;
+    });
+    const attrs = [["answerInput","placeholder", currentLanguage === "bm" ? "?" : "?"],["answerInput","aria-label",currentLanguage === "bm" ? "Jawapan anda" : "Your answer"],["languageSelect","aria-label",currentLanguage === "bm" ? "Pilih bahasa" : "Choose language"]];
+    attrs.forEach(([id,attr,val])=>$(id)?.setAttribute(attr,val));
+    if ($("musicButton")) $("musicButton").textContent = currentLanguage === "bm" ? (musicOn ? "♫ Muzik: Hidup" : "♫ Muzik: Mati") : (musicOn ? "♫ Music: On" : "♫ Music: Off");
+    if (question) {
+      $("questionText").textContent = question.text;
+      if (currentLanguage === "bm") {
+        if ($("feedback").textContent === "Detective, enter your guess using the keypad.") setFeedback("Detektif, masukkan tekaan anda menggunakan papan kekunci.");
+      }
+    }
+    const detectiveTip = document.querySelector(".right-stack .clue strong");
+    if (detectiveTip) detectiveTip.textContent = currentLanguage === "bm" ? "Tip detektif:" : "Detective tip:";
+    const tipBox = document.querySelector(".right-stack .clue");
+    if (tipBox) {
+      const tipText = currentLanguage === "bm"
+        ? " Untuk faktor yang hilang, tanya diri anda: “Nombor apakah yang didarab dengan faktor yang diketahui untuk menghasilkan hasil darab ini?”"
+        : " For a missing factor, ask yourself: “What number multiplied by the known factor gives this product?”";
+      const strong = tipBox.querySelector("strong");
+      tipBox.innerHTML = "💡 ";
+      tipBox.appendChild(strong);
+      tipBox.appendChild(document.createTextNode(tipText));
+    }
+    if ($("authorTag")) {
+      $("authorTag").textContent = currentLanguage === "bm" ? "Dibina oleh DAPHNE TANG LI YUN" : "Developed by DAPHNE TANG LI YUN";
+    }
+    renderClue();
+    renderNotebook(); renderBadges();
+  }
+  const languageObserver = new MutationObserver(mutations => {
+    if (currentLanguage !== "bm") return;
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes || []) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          if (!englishText.has(node)) englishText.set(node, node.nodeValue);
+          const original = englishText.get(node);
+          const translated = translateText(original, "bm");
+          if (translated !== node.nodeValue) node.nodeValue = translated;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+          while (walker.nextNode()) {
+            const t=walker.currentNode;
+            if (!englishText.has(t)) englishText.set(t, t.nodeValue);
+            const tr=translateText(englishText.get(t),"bm");
+            if(tr!==t.nodeValue)t.nodeValue=tr;
+          }
+        }
+      }
+    }
+  });
+  languageObserver.observe(document.body, {childList:true,subtree:true});
+
+  const encouragingCorrect = [
+    "Brilliant deduction! You cracked the code!",
+    "Excellent work, detective! Another clue secured!",
+    "Case solved! Your multiplication skills are sharp!",
+    "Amazing reasoning! The safe is one step closer to opening!",
+    "Well done! A top detective checks the evidence carefully!"
+  ];
+  const encouragingWrong = [
+    "Not quite, detective. Check the known factor and try again!",
+    "That clue doesn't fit yet. Keep investigating!",
+    "Every great detective makes guesses. Try another number!",
+    "Almost there! Think: what number makes this equation true?",
+    "The safe is still locked. Use your multiplication clues!"
+  ];
+  const clueMessages = [
+    "Try a number, then check whether the equation is true.",
+    "For a missing factor, think of the times table that contains the product.",
+    "Remember: factor × factor = product.",
+    "A careful detective tests a guess against the whole equation.",
+    "Look closely at the known number. Which multiplication fact fits?"
+  ];
+
+  const badgeDefinitions = [
+    {id:"junior",name:"Junior Detective",icon:"🔎",description:"Collect your first equation.",test:()=>discoveredKeys.size>=1},
+    {id:"sharp",name:"Sharp-Eyed Sleuth",icon:"🧐",description:"Collect 10 unique equations.",test:()=>discoveredKeys.size>=10},
+    {id:"clue",name:"Clue Collector",icon:"📓",description:"Collect 50 unique equations.",test:()=>discoveredKeys.size>=50},
+    {id:"expert",name:"Detective Expert",icon:"🕵️",description:"Collect 100 unique equations.",test:()=>discoveredKeys.size>=100},
+    {id:"master",name:"Master Investigator",icon:"🏅",description:"Collect 200 unique equations.",test:()=>discoveredKeys.size>=200},
+    {id:"first-type",name:"Missing Factor Expert",icon:"🔢",description:"Collect every missing-first-factor entry.",test:()=>allKeysOfType("first")},
+    {id:"second-type",name:"Factor Finder",icon:"🧩",description:"Collect every missing-second-factor entry.",test:()=>allKeysOfType("second")},
+    {id:"product-type",name:"Product Detective",icon:"✖️",description:"Collect every missing-product entry.",test:()=>allKeysOfType("product")},
+    {id:"legend",name:"Legendary Detective",icon:"🏆",description:"Collect all 300 unique equations.",test:()=>discoveredKeys.size>=MAX_EQUATIONS}
+  ];
+  const tableBadges = Array.from({length:10},(_,i)=>({
+    id:`table-${i+1}`,name:`${i+1} Times Table Master`,icon:"⭐",
+    description:`Complete all 30 entries for the ${i+1} times table.`
+  }));
+  const allBadges = [...badgeDefinitions,...tableBadges];
+
+  function randomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+  function randomItem(list){return list[randomInt(0,list.length-1)]}
+  function formatQuestion(type,a,b){
+    if(type==="first") return `□ × ${b} = ${a*b}`;
+    if(type==="second") return `${a} × □ = ${a*b}`;
+    return `${a} × ${b} = □`;
+  }
+  
+  function makeQuestion(){
+    // If cases solved > 300 and we haven't collected everything yet,
+    // 75% chance to force an uncollected equation, 25% chance to be random.
+    if (roundCount >= 300 && discoveredKeys.size < MAX_EQUATIONS) {
+      if (Math.random() < 0.75) {
+        const uncollected = [];
+        const types = ["first", "second", "product"];
+        for (let t of types) {
+          for (let i = 1; i <= 10; i++) {
+            for (let j = 1; j <= 10; j++) {
+              const k = `${t}:${i}:${j}`;
+              if (!discoveredKeys.has(k)) {
+                uncollected.push({type: t, a: i, b: j});
+              }
+            }
+          }
+        }
+        if (uncollected.length > 0) {
+          const picked = uncollected[randomInt(0, uncollected.length - 1)];
+          const type = picked.type, a = picked.a, b = picked.b;
+          const answer = type==="first" ? a : type==="second" ? b : a*b;
+          const key = `${type}:${a}:${b}`;
+          return {type,a,b,answer,key,text:formatQuestion(type,a,b),product:a*b};
+        }
+      }
+    }
+
+    // Default Random Generation
+    const type = ["first","second","product"][randomInt(0,2)];
+    const a = randomInt(1,10), b = randomInt(1,10);
+    const answer = type==="first" ? a : type==="second" ? b : a*b;
+    const key = `${type}:${a}:${b}`;
+    return {type,a,b,answer,key,text:formatQuestion(type,a,b),product:a*b};
+  }
+
+  function setFeedback(message,kind=""){
+    $("feedback").textContent=message;
+    $("feedback").className=`feedback ${kind}`;
+  }
+  function newCase(){
+    if (autoNextTimer) clearTimeout(autoNextTimer);
+    $("safeLight").style.background = "#6bf0a4";
+    $("safeLight").style.boxShadow = "0 0 12px #6bf0a4";
+    question=makeQuestion();
+    $("questionText").textContent=question.text;
+    $("answerInput").value="";
+    $("caseMessage").textContent="Solve the equation to collect it in your notebook.";
+    const clue = randomItem(clueMessages);
+    setClue(clue, "clue");
+    setFeedback("Detective, enter your guess using the keypad.");
+    $("newCaseButton").textContent="New Case ↻";
+  }
+  function addDigit(digit){
+    const input=$("answerInput");
+    if(input.value.length>=3)return;
+    input.value+=digit;
+    input.focus();
+  }
+  function checkAnswer(){
+    if(!question)return;
+    const raw=$("answerInput").value.trim();
+    if(raw==="" || !/^\d+$/.test(raw)){
+      setFeedback("Enter a whole number first, detective.","bad");
+      playSound("wrong");
+      return;
+    }
+    const answer=Number(raw);
+    if(answer!==question.answer){
+      setFeedback(randomItem(encouragingWrong),"bad");
+      $("caseMessage").textContent="The safe remains locked. Check the multiplication fact and try again.";
+      playSound("wrong");
+      return;
+    }
+
+    roundCount++;
+    const isNew=!discoveredKeys.has(question.key);
+    if(isNew){
+      discoveredKeys.add(question.key);
+      notebookEntries.set(question.key,{
+        key:question.key,type:question.type,a:question.a,b:question.b,
+        product:question.product,text:question.text,solvedAt:roundCount
+      });
+      $("caseMessage").textContent="New clue collected! Your equation has been added to the notebook.";
+      renderNotebook();
+      updateStats();
+      checkAchievements();
+    }else{
+      $("caseMessage").textContent="You've already collected this equation. It remains in your notebook!";
+      updateStats();
+    }
+    
+    setFeedback(randomItem(encouragingCorrect),"good");
+    playSound("correct");
+    $("safeLight").style.background = "#fff";
+    $("safeLight").style.boxShadow = "0 0 15px #fff";
+    setClue(currentClueEnglish, "unlocked");
+    $("answerInput").value="";
+    $("newCaseButton").textContent="Loading... ↻";
+    $("newCaseButton").style.transform = "scale(1.05)"; 
+    
+    autoNextTimer = setTimeout(() => {
+        newCase();
+        $("newCaseButton").style.transform = "scale(1)";
+    }, 1000); 
+  }
+
+  function typeLabel(type){
+    if(currentLanguage==="bm") return type==="first"?"Faktor pertama hilang":type==="second"?"Faktor kedua hilang":"Hasil darab hilang";
+    return type==="first"?"Missing first factor":type==="second"?"Missing second factor":"Missing product";
+  }
+  function tableMatches(entry,table){
+    if(table==="all")return true;
+    const t=Number(table);
+    return entry.a===t || entry.b===t;
+  }
+  
+  function getFilteredSortedNotebook() {
+      const type=$("typeFilter").value;
+      const table=$("tableFilter").value;
+      const sort=$("sortSelect").value;
+      let entries=[...notebookEntries.values()].filter(e=>(type==="all"||e.type===type)&&tableMatches(e,table));
+      if(sort==="newest")entries.sort((a,b)=>b.solvedAt-a.solvedAt);
+      if(sort==="type")entries.sort((a,b)=>typeLabel(a.type).localeCompare(typeLabel(b.type))||a.text.localeCompare(b.text));
+      if(sort==="product")entries.sort((a,b)=>a.product-b.product||a.text.localeCompare(b.text));
+      if(sort==="equation")entries.sort((a,b)=>a.text.localeCompare(b.text,undefined,{numeric:true}));
+      if(sort==="chart")entries.sort((a,b)=>Math.min(a.a,a.b)-Math.min(b.a,b.b)||Math.max(a.a,a.b)-Math.max(b.a,b.b)||a.type.localeCompare(b.type));
+      return entries;
+  }
+
+  function renderNotebook(){
+    const entries = getFilteredSortedNotebook();
+    const list=$("notebookList");
+    if(!entries.length){
+      list.innerHTML='<div class="empty">No equations match this view yet. Keep solving cases!</div>';
+      return;
+    }
+    list.innerHTML=entries.map(e=>`<div class="equation-item"><div><strong>${e.text}</strong><small>${typeLabel(e.type)} · ${e.a} × ${e.b} = ${e.product}</small></div><span aria-label="collected">📌</span></div>`).join("");
+  }
+  
+  function updateStats(){
+    $("solvedCount").textContent=discoveredKeys.size;
+    $("roundCount").textContent=roundCount;
+    $("notebookCount").textContent=`${discoveredKeys.size} / ${MAX_EQUATIONS}`;
+    $("collectionProgress").style.width=`${discoveredKeys.size/MAX_EQUATIONS*100}%`;
+    $("badgeCount").textContent=unlockedBadges.size;
+  }
+  function allKeysOfType(type){
+    for(let a=1;a<=10;a++)for(let b=1;b<=10;b++){
+      if(!discoveredKeys.has(`${type}:${a}:${b}`))return false;
+    }
+    return true;
+  }
+  function isTableComplete(table){
+    for(let n=1;n<=10;n++){
+      if(!discoveredKeys.has(`first:${table}:${n}`))return false;
+      if(!discoveredKeys.has(`second:${table}:${n}`))return false;
+      if(!discoveredKeys.has(`product:${table}:${n}`))return false;
+    }
+    return true;
+  }
+  function queueAchievement(title,message,icon,hint){
+    achievementQueue.push({title,message,icon,hint});
+    showNextAchievement();
+  }
+  function showNextAchievement(){
+    if(achievementIsOpen||achievementQueue.length===0)return;
+    const item=achievementQueue.shift();
+    $("achievementTitle").textContent=item.title;
+    $("achievementMessage").textContent=item.message;
+    $("achievementIcon").textContent=item.icon;
+    $("achievementHint").textContent=item.hint||"";
+    $("achievementModal").hidden=false;
+    achievementIsOpen=true;
+  }
+  function closeAchievement(){
+    $("achievementModal").hidden=true;
+    achievementIsOpen=false;
+    window.setTimeout(showNextAchievement,150);
+  }
+  function checkAchievements(){
+    for(const badge of badgeDefinitions){
+      if(!unlockedBadges.has(badge.id)&&badge.test()){
+        unlockedBadges.add(badge.id);
+        queueAchievement("Badge Unlocked!",`Congratulations! You've earned the ${badge.name} badge!`,badge.icon,"Check your Detective Badge Case File to see your achievement.");
+      }
+    }
+    for(let table=1;table<=10;table++){
+      if(!completedTables.has(table)&&isTableComplete(table)){
+        completedTables.add(table);
+        unlockedBadges.add(`table-${table}`);
+        queueAchievement("Case Closed!",`Congratulations! You've collected the ${table} times table!`,"🎉","You can go to your notebook to check your collected equations.");
+        queueAchievement("Badge Unlocked!",`You've earned the ${table} Times Table Master badge!`,"⭐","Check your Detective Badge Case File!");
+      }
+    }
+    if(discoveredKeys.size>=MAX_EQUATIONS&&!unlockedBadges.has("grand-finale")){
+      unlockedBadges.add("grand-finale");
+      allBadges.push({id:"grand-finale",name:"Ultimate Detective",icon:"🏆",description:"Collect all 300 unique equations."});
+      queueAchievement("Ultimate Detective!", "Congratulations! You've collected all 300 equations!","🏆","You've solved every case. Visit your notebook to review your complete collection!");
+    }
+    renderBadges();
+    updateStats();
+  }
+  function renderBadges(){
+    $("badgeGrid").innerHTML=allBadges.map(b=>{
+      const unlocked=unlockedBadges.has(b.id);
+      const displayName = translateText(b.name, currentLanguage);
+      const displayDesc = translateText(unlocked ? b.description : "Keep solving equations to unlock!", currentLanguage);
+      return `<div class="badge-item ${unlocked?"unlocked":"locked"}"><div class="badge-symbol">${unlocked?b.icon:"🔒"}</div><div class="badge-name">${displayName}</div><div class="badge-description">${displayDesc}</div></div>`;
+    }).join("");
+    $("badgeProgress").textContent=`Badges unlocked: ${unlockedBadges.size} / ${allBadges.length}`;
+    $("badgeCount").textContent=unlockedBadges.size;
+  }
+
+  $("dlPdfButton").addEventListener("click", () => {
+    const entries = getFilteredSortedNotebook();
+    let printHtml = `
+      <html>
+      <head>
+        <title>Detective Notebook - Print/PDF</title>
+        <style>
+          body { font-family: system-ui, sans-serif; padding: 20px; color: #101b35; }
+          h1 { color: #1c2e52; border-bottom: 2px solid #1c2e52; padding-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #c6d3e9; padding: 12px; text-align: left; }
+          th { background: #f4c95d; color: #101b35; }
+          tr:nth-child(even) { background: #f9fbff; }
+        </style>
+      </head>
+      <body>
+        <h1>📓 Detective Notebook</h1>
+        <p>Current active filters applied: ${entries.length} equations found.</p>
+        <table>
+          <tr><th>Equation</th><th>Question Type</th><th>Factors</th><th>Product</th></tr>`;
+    entries.forEach(e => {
+        printHtml += `<tr><td><strong>${e.text}</strong></td><td>${typeLabel(e.type)}</td><td>${e.a} × ${e.b}</td><td>${e.product}</td></tr>`;
+    });
+    printHtml += `</table><script>window.onload = function() { window.print(); window.close(); }<\/script></body></html>`;
+    const printWin = window.open("", "_blank");
+    printWin.document.write(printHtml);
+    printWin.document.close();
+  });
+
+  $("dlBadgesButton").addEventListener("click", () => {
+    let printHtml = `
+      <html>
+      <head>
+        <title>Detective Badges - Print/PDF</title>
+        <style>
+          body { font-family: system-ui, sans-serif; padding: 20px; color: #101b35; }
+          h1 { color: #1c2e52; border-bottom: 2px solid #1c2e52; padding-bottom: 10px; }
+          .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;}
+          .badge { border: 2px solid #d7e1f5; border-radius: 12px; padding: 15px; text-align: center; }
+          .badge.unlocked { border-color: #f4c95d; background: #fffdf4; }
+          .badge.locked { opacity: 0.6; filter: grayscale(1); background: #f5f7fa; }
+          .icon { font-size: 40px; margin-bottom: 10px; }
+          .title { font-weight: bold; font-size: 1.1em; }
+          .desc { font-size: 0.85em; color: #555; margin-top: 8px; }
+        </style>
+      </head>
+      <body>
+        <h1>🏅 Detective Badge Case File</h1>
+        <p>Total Unlocked: ${unlockedBadges.size} / ${allBadges.length}</p>
+        <div class="badge-grid">`;
+    allBadges.forEach(b => {
+        const unlocked = unlockedBadges.has(b.id);
+        const displayName = translateText(b.name, currentLanguage);
+        const displayDesc = translateText(unlocked ? b.description : "Locked", currentLanguage);
+        printHtml += `<div class="badge ${unlocked ? 'unlocked' : 'locked'}">
+          <div class="icon">${unlocked ? b.icon : '🔒'}</div>
+          <div class="title">${displayName}</div>
+          <div class="desc">${displayDesc}</div>
+        </div>`;
+    });
+    printHtml += `</div><script>window.onload = function() { window.print(); window.close(); }<\/script></body></html>`;
+    const printWin = window.open("", "_blank");
+    printWin.document.write(printHtml);
+    printWin.document.close();
+  });
+
+  function getAudio(){
+    if(!audioContext){
+      const AudioCtx=window.AudioContext||window.webkitAudioContext;
+      if(!AudioCtx)return null;
+      audioContext=new AudioCtx();
+    }
+    if(audioContext.state==="suspended")audioContext.resume();
+    return audioContext;
+  }
+  function tone(freq,duration,wave="sine",volume=.045,delay=0){
+    const ctx=getAudio();if(!ctx)return;
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type=wave;osc.frequency.value=freq;
+    gain.gain.setValueAtTime(.0001,ctx.currentTime+delay);
+    gain.gain.exponentialRampToValueAtTime(volume,ctx.currentTime+delay+.02);
+    gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+delay+duration);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start(ctx.currentTime+delay);osc.stop(ctx.currentTime+delay+duration+.03);
+  }
+  function playSound(kind){
+    if(kind==="correct"){tone(660,.13,"sine",.06);tone(880,.18,"sine",.05,.12);tone(1100,.22,"triangle",.04,.25);}
+    else{tone(220,.16,"triangle",.05);tone(165,.2,"triangle",.045,.13);}
+  }
+  const melody=[392,440,523,440,349,392,440,330,392,440,494,440,330,392,349,294];
+  function musicTick(){
+    if(!musicOn)return;
+    const note=melody[musicStep%melody.length];
+    tone(note,.22,"triangle",.018);
+    if(musicStep%4===0)tone(note/2,.32,"sine",.012);
+    musicStep++;
+  }
+  function toggleMusic(){
+    if(!getAudio()){ $("musicButton").textContent="♫ Audio unavailable";return; }
+    musicOn=!musicOn;
+    $("musicButton").textContent=musicOn?"♫ Music: On":"♫ Music: Off";
+    if(musicOn){musicTick();musicTimer=window.setInterval(musicTick,320);}
+    else{window.clearInterval(musicTimer);musicTimer=null;}
+  }
+
+  $("checkButton").addEventListener("click",checkAnswer);
+  $("keyCheck").addEventListener("click",checkAnswer);
+  $("answerInput").addEventListener("keydown",e=>{if(e.key==="Enter")checkAnswer();});
+  $("keypad").addEventListener("click",e=>{
+    const btn=e.target.closest("button[data-key]");if(!btn)return;
+    const key=btn.dataset.key;
+    if(key==="clear") { $("answerInput").value=""; $("answerInput").focus(); }
+    else if(key==="back") { $("answerInput").value=$("answerInput").value.slice(0,-1); $("answerInput").focus(); }
+    else addDigit(key);
+  });
+  $("newCaseButton").addEventListener("click",()=>{newCase();});
+  $("musicButton").addEventListener("click",toggleMusic);
+  $("typeFilter").addEventListener("change",renderNotebook);
+  $("tableFilter").addEventListener("change",renderNotebook);
+  $("sortSelect").addEventListener("change",renderNotebook);
+  $("showNotebookButton").addEventListener("click",()=>{
+    $("typeFilter").value="all";$("tableFilter").value="all";$("sortSelect").value="newest"; renderNotebook();
+  });
+  $("closeAchievement").addEventListener("click",closeAchievement);
+  $("achievementButton").addEventListener("click",closeAchievement);
+  $("achievementModal").addEventListener("click",e=>{if(e.target.id==="achievementModal")closeAchievement();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("achievementModal").hidden)closeAchievement();});
+
+  $("languageSelect").addEventListener("change", e => applyLanguage(e.target.value));
+  renderBadges();
+  updateStats();
+  newCase();
+  applyLanguage("bm");
+})();
+</script>
+</body>
+</html>
